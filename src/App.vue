@@ -2,7 +2,8 @@
   <div id="app">
     <!--<div id="nav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/about">About</router-link> |
+      <router-link to="/Roomdetail">Roomdetail</router-link>
     </div>-->
     <router-view/>
     <ft/>
@@ -13,7 +14,7 @@ import ft from '@/components/footer.vue'
 export default {
     components: {
     ft
-  },
+  }
 }
 </script>
 <style>
@@ -41,3 +42,4 @@ body {
   color: #42b983;
 }
 </style>
+

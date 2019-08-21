@@ -1,6 +1,6 @@
 <template>
   <div>
-     <div style="height:80px;"></div> 
+     <div style="height:80px;"></div>
       <el-footer class="clearfix">
         <el-row style="padding-top:20px;">
           <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
@@ -16,6 +16,11 @@
       </el-footer>
   </div>
 </template>
+<script>
+export default {
+  name:'ft'
+}
+</script>
 <style scoped>
 .el-footer {
   position: fixed;
@@ -27,6 +32,7 @@
   color: #999;
   text-align: center;
   font-size: 8px;
+  z-index: 999;
 }
   .clearfix:before,
   .clearfix:after {
