@@ -8,8 +8,8 @@
         <span>傳送過來房型資料  平日住幾天 / 假日住幾天 / 應付金額</span>
         <span v-for="(item, index) in bookingForm" :key="index">{{item}}</span>
         <span slot="footer" class="dialog-footer">
-            <el-button @click="closeDialog()">取消</el-button>
-            <el-button type="primary" @click="closeDialog()">確定</el-button>
+            <el-button type="danger" @click="closeDialog()">取消</el-button>
+            <el-button type="info" @click="closeDialog()">確定</el-button>
         </span>
     </el-dialog>
   </div>
