@@ -14,9 +14,10 @@
               <div style="padding: 14px;">
                 <span>{{ item.name }}</span>
                 <div class="bottom clearfix">
-                  <span class="price"> 平日: $ {{ item.normalDayPrice }} /</span>
-                  <span class="price"> 假日: $ {{ item.holidayPrice }}</span>
-                  <router-link to="/Roomdetail"><el-link type="info" class="button">View<i class="el-icon-view el-icon--right"></i> </el-link></router-link>
+                  <span class="price"> weekday: $ {{ item.normalDayPrice }}</span>
+                  <br/>
+                  <span class="price"> weekend: $ {{ item.holidayPrice }}</span>
+                  <el-link type="info" class="button" @click="goRoom(item.id)">View<i class="el-icon-view el-icon--right"></i> </el-link>
                 </div>
               </div>
             </el-card>          
@@ -36,18 +37,24 @@ export default {
       rooms: [],
     }
   },
+  methods:{
+    goRoom(roomId){
+      this.$router.push({
+				name: 'roomdetail',
+				params: { id: roomId },
+			});
+    }
+  },
   mounted() {
-    console.log('執行getRoomsList')
     getRoomsList()
-    .then(res=> {
-      // console.log(res.data);
+    .then(res => {
       this.rooms = res.data.items;
-      console.log(this.rooms)
+      // console.log(this.rooms)
     })
-    .catch(err=> {
+    .catch(err => {
       console.log(err);
     })
-  }
+  },
 }
 </script>
 <style scoped>
