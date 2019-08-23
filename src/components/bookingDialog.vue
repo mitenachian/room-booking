@@ -1,30 +1,51 @@
 <template>
   <div class="bookingDialog">
       <el-dialog
-        title="訂房資訊"
+        title="您的訂房資訊"
         :visible.sync="visible" :show="visible"
         width="30%"
         @close="closeDialog()">
-        <span>傳送過來房型資料  平日住幾天 / 假日住幾天 / 應付金額</span>
-        <span v-for="(item, index) in bookingForm" :key="index">{{item}}</span>
+        <div>
+          <span> 訂房大名: {{bookingForm.name}} | 聯絡電話:{{bookingForm.tel}}</span>
+          <el-divider></el-divider>
+          <span>入住日期: {{ dayFormat(bookingForm.start) }} / </span> 
+          <span>退房日期: {{ dayFormat(bookingForm.end) }}</span>
+          <el-divider></el-divider>
+          <span>假日:{{weekdays}} 晚 * {{weekdayPrice | toCurrency}} / </span>
+          <span>平日:{{holidays}} 晚 * {{holiayPrice | toCurrency}}</span>
+          <el-divider></el-divider>
+          <span>總額: {{total | toCurrency}} (已含手續費: {{ fee | toCurrency}})</span>
+        </div>
+        
         <span slot="footer" class="dialog-footer">
             <el-button type="danger" @click="closeDialog()">取消</el-button>
-            <el-button type="info" @click="closeDialog()">確定</el-button>
+            <el-button type="info" @click="sendBooking()">確定</el-button>
         </span>
     </el-dialog>
   </div>
 </template>
 <script>
+import { roomBooking } from "../RoomApi"
 export default {
   name:'bookingDialog',
   props: {
     dialogVisible: Boolean,
     bookingForm: Object,
     roomId: String,
+    holidays: Number,
+    weekdays: Number,
+    holiayPrice: Number,
+    weekdayPrice: Number,
   },
   data() {
       return {
           visible : false,
+          fee: 500,
+          bookedForm: {
+            name: this.bookingForm.name,
+            tel: this.bookingForm.tel,
+            'date': this.bookingForm.day,
+          },
       }
   },
   methods: {
@@ -33,7 +54,34 @@ export default {
     },
     changeVisible() {
 		this.visible = this.dialogVisible;
-	}
+    },
+    sendBooking() {
+          this.bookedForm= {
+            name: this.bookingForm.name,
+            tel: this.bookingForm.tel,
+            'date': this.bookingForm.day,
+          },
+      console.log(this.bookedForm)
+      roomBooking( this.roomId, this.bookedForm)
+      .then(res => {
+        console.log(res.data);
+        })
+        .catch(err => {
+          console.log(err);
+          })
+    },
+  	// 時間字串處理
+        dayFormat(date) {
+          if(date) {
+            return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
+          }
+        },
+  
+  },
+  computed: {
+    total() {
+      return ( (this.holidays * this.holiayPrice) + (this.weekdays * this.weekdayPrice) ) + 500;
+    }
   },
   watch: {
      'dialogVisible': {

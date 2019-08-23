@@ -10,7 +10,7 @@ const apiRequest = axios.create({
     baseURL: 'https://challenge.thef2e.com/api/thef2e2019/stage6/',
     timeout: 10000,
     headers: {
-        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/json',
         'Access-Control-Allow-Credentials': true,
 		'Access-Control-Allow-Origin': '*',
 		'Access-Control-Allow-Methods': '*',
@@ -20,12 +20,20 @@ const apiRequest = axios.create({
   });
 
 /* API */
-// [GET] 取得所有房型OK
+// [GET] 取得所有房型
 export const getRoomsList = () => apiRequest.get('/rooms')
+
 // [GET] 單一房型細節
-export const getRoomsDetail = data => apiRequest.get(`/room/${data}`,data)
+export const getRoomsDetail = data => apiRequest.get(`/room/${data}`)
+
 // [POST] 訂房
-export const roomBooking = data => apiRequest.post(`/room/${data}`, data)
+// export const roomBooking = data => apiRequest.post(`/room/${id}`, data)
+
+export function roomBooking(id, data) {
+
+    return apiRequest.post(`/room/${id}`, data)
+}
+
 // [DELETE] 清除所有預約
 export const bookingDel = data => apiRequest.delete('/rooms', data)
 

@@ -3,7 +3,7 @@
     <h3 class="homeTitle">COZY ROOM</h3>
     <div>
       <el-row>
-        <el-col :xs="12" :sm="12" :md="8" :lg="4" :xl="4"  v-for="item in rooms" :key="item.index">
+        <el-col :xs="12" :sm="12" :md="8" :lg="4" :xl="4"  v-for="item in roomRandomList" :key="item.index">
           <div class="grid-content">
             <el-card :body-style="{ padding: '0px' }" shadow="never">
               <div style="height:350px;overflow:hidden;text-align:center;">
@@ -14,9 +14,9 @@
               <div style="padding: 14px;">
                 <span>{{ item.name }}</span>
                 <div class="bottom clearfix">
-                  <span class="price"> weekday: $ {{ item.normalDayPrice }}</span>
+                  <span class="price"> weekday: {{ item.normalDayPrice  | toCurrency }}</span>
                   <br/>
-                  <span class="price"> weekend: $ {{ item.holidayPrice }}</span>
+                  <span class="price"> weekend: {{ item.holidayPrice  | toCurrency}}</span>
                   <el-link type="info" class="button" @click="goRoom(item.id)">View<i class="el-icon-view el-icon--right"></i> </el-link>
                 </div>
               </div>
@@ -49,12 +49,18 @@ export default {
     getRoomsList()
     .then(res => {
       this.rooms = res.data.items;
-      // console.log(this.rooms)
     })
     .catch(err => {
       console.log(err);
     })
   },
+  computed:{
+    // 亂數排序roomlist
+    roomRandomList () {
+      const rooms = [... this.rooms]
+      return rooms.sort(() => Math.random() - 0.5);
+    }
+  }
 }
 </script>
 <style scoped>
