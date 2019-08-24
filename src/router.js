@@ -25,6 +25,12 @@ export default new Router({
       path: '/roomdetail/:id',
       name: 'roomdetail',
       component: () => import('./views/Roomdetail.vue')
+    },
+    {
+      path: '/bookingFinish',
+      name: 'bookingFinish',
+      component: () => import('./views/bookingFinish.vue')
     }
+
   ]
 })

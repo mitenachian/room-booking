@@ -52,7 +52,7 @@ export default {
 	closeDialog() {
 		  this.$emit('closeDialog');
   },
-    changeVisible() {
+  changeVisible() {
 		  this.visible = this.dialogVisible;
   },
   sendBooking() {
@@ -67,27 +67,18 @@ export default {
       .then(res => {
         console.log(res.data);
         this.visible = false;
-        // this.$notify({
-        //   title: '訂房完成',
-        //   message: 'COZY ROOM 期待與您的相見!',
-        //   type: 'success',
-        //   position: 'bottom-right'
-        // });
-        this.$alert('COZY ROOM 期待與您的相見!', '訂房完成', {
-          confirmButtonText: 'OK',
-          callback: action => {
-            this.$router.go()  
-          }
+        this.$notify({
+          title: '訂房成功',
+          message: 'COZY ROOM 期待與您的相見',
+          type: 'success',
         });
         this.loading = false;
       })
       .catch(err => {
         console.log(err);
-        this.$alert('欠修理中ˊ<_ˋ', '訂房失敗', {
-          confirmButtonText: 'CLOSE',
-          callback: action => {
-            this.$router.go()  
-          }
+        this.$notify.error({
+          title: '訂房失敗',
+          message: '欠修理中~'
         });
       })
   },

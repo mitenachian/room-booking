@@ -174,20 +174,20 @@ export default {
         room: [],
         roomId: '',
         bookingForm: {
-            name: 'Mitena',
-            tel: '093545678',
+            name: '',
+            tel: '',
             day: [],
             start: '',
             end:'',
         },
         rules: { // 表單驗證
           name: [
-            { required: true, message: 'name is required', trigger: 'blur' },
+            { required: true, message: '請輸入訂房大名', trigger: 'blur' },
             { min: 1, max: 20, message: '1~20 words', trigger: 'blur' }
           ],
           tel: [
-            { required: true, message: 'phone is required', trigger: 'blur' },
-            { min: 5, max: 10, message: 'erroe nubmer', trigger: 'blur' }
+            { required: true, message: '請輸入連絡電話', trigger: 'blur' },
+            { min: 5, max: 10, message: '號碼必須5~10碼', trigger: 'blur' }
           ],
           date: [
             { validator: this.checkDatePick, trigger: 'blur' }
@@ -262,6 +262,9 @@ export default {
         },
         closeDialog() {
             this.dialogVisible = false;
+            this.$router.push({
+              name: 'bookingFinish',
+            }); 
         },
         // 日期+幾天後
         addDaysSet(AddDayCount) {
@@ -338,7 +341,7 @@ export default {
                 .catch(err => {
                     console.log(err);
             })
-        }
+        },
     }
 }
 </script>
