@@ -35,5 +35,5 @@ export function roomBooking(id, data) {
 }
 
 // [DELETE] 清除所有預約
-export const bookingDel = data => apiRequest.delete('/rooms', data)
+export const bookingDel = () => apiRequest.delete('/rooms')
 

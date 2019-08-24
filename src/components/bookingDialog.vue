@@ -3,7 +3,6 @@
       <el-dialog
         title="您的訂房資訊"
         :visible.sync="visible" :show="visible"
-        width="30%"
         @close="closeDialog()">
         <div>
           <span> 訂房大名: {{bookingForm.name}} | 聯絡電話:{{bookingForm.tel}}</span>
@@ -19,7 +18,7 @@
         
         <span slot="footer" class="dialog-footer">
             <el-button type="danger" @click="closeDialog()">取消</el-button>
-            <el-button type="info" @click="sendBooking()">確定</el-button>
+            <el-button type="info" @click="sendBooking()" v-loading.fullscreen.lock="loading">確定</el-button>
         </span>
     </el-dialog>
   </div>
@@ -39,6 +38,7 @@ export default {
   },
   data() {
       return {
+          loading: false,
           visible : false,
           fee: 500,
           bookedForm: {
@@ -50,32 +50,53 @@ export default {
   },
   methods: {
 	closeDialog() {
-		this.$emit('closeDialog');
-    },
+		  this.$emit('closeDialog');
+  },
     changeVisible() {
-		this.visible = this.dialogVisible;
-    },
-    sendBooking() {
-          this.bookedForm= {
-            name: this.bookingForm.name,
-            tel: this.bookingForm.tel,
-            'date': this.bookingForm.day,
-          },
-      console.log(this.bookedForm)
+		  this.visible = this.dialogVisible;
+  },
+  sendBooking() {
+      this.bookedForm = {
+        name: this.bookingForm.name,
+        tel: this.bookingForm.tel,
+        'date': this.bookingForm.day,
+      },
+      console.log(this.bookedForm);
+      this.loading = true;
       roomBooking( this.roomId, this.bookedForm)
       .then(res => {
         console.log(res.data);
-        })
-        .catch(err => {
-          console.log(err);
-          })
-    },
-  	// 時間字串處理
-        dayFormat(date) {
-          if(date) {
+        this.visible = false;
+        // this.$notify({
+        //   title: '訂房完成',
+        //   message: 'COZY ROOM 期待與您的相見!',
+        //   type: 'success',
+        //   position: 'bottom-right'
+        // });
+        this.$alert('COZY ROOM 期待與您的相見!', '訂房完成', {
+          confirmButtonText: 'OK',
+          callback: action => {
+            this.$router.go()  
+          }
+        });
+        this.loading = false;
+      })
+      .catch(err => {
+        console.log(err);
+        this.$alert('欠修理中ˊ<_ˋ', '訂房失敗', {
+          confirmButtonText: 'CLOSE',
+          callback: action => {
+            this.$router.go()  
+          }
+        });
+      })
+  },
+  // 時間字串處理
+  dayFormat(date) {
+      if(date) {
             return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
           }
-        },
+      },
   
   },
   computed: {
@@ -90,7 +111,7 @@ export default {
         },
         immediate: true
       }
-    },
+    }
 }
 </script>
 <style scoped>

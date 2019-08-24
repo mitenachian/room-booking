@@ -6,10 +6,10 @@
         <el-col :xs="12" :sm="12" :md="8" :lg="4" :xl="4"  v-for="item in roomRandomList" :key="item.index">
           <div class="grid-content">
             <el-card :body-style="{ padding: '0px' }" shadow="never">
-              <div style="height:350px;overflow:hidden;text-align:center;">
-                <el-image
+              <div class="imgBox">
+                <img
                 class="image"
-                :src="item.imageUrl"></el-image>
+                :src="item.imageUrl"></img>
               </div>
               <div style="padding: 14px;">
                 <span>{{ item.name }}</span>
@@ -20,7 +20,7 @@
                   <el-link type="info" class="button" @click="goRoom(item.id)">View<i class="el-icon-view el-icon--right"></i> </el-link>
                 </div>
               </div>
-            </el-card>          
+            </el-card>       
           </div>
         </el-col>
       </el-row>
@@ -66,7 +66,7 @@ export default {
 <style scoped>
 .homeTitle {
   font-family:  'Amatic SC', cursive;
-  font-size: 100px;
+  font-size: 60px;
 }
 .el-col {
     border:none;
@@ -89,11 +89,6 @@ export default {
   padding: 0;
   float: right;
 }
-.image {
-  width: 100%;
-  display: block;
-  height: 100%;
-}
 .clearfix:before,
 .clearfix:after {
   display: table;
@@ -105,4 +100,18 @@ export default {
 .el-card {
   border-radius: 0px;
 }
+.imgBox{
+  width:100%;
+  height:320px;
+  overflow: hidden;
+  position: relative;
+    margin: 0 auto;
+}
+.imgBox .image {
+  object-fit: cover;
+  position: absolute;
+  height:380px;
+  min-width: 100%;
+}
+
 </style>

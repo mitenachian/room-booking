@@ -8,10 +8,11 @@
         <el-row :gutter="10">
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
                 <div class="grid-content bg-purple">
-                      <el-carousel height="680px"  trigger="click" direction="vertical" :autoplay="false" >
+                      <el-carousel height="680px"  trigger="click" direction="vertical" :autoplay="true" >
                         <el-carousel-item v-for="item in room.imageUrl" :key="item">
-                            <el-image
-                            :src="item"></el-image>
+                            <div class="imgBox">
+                                <img class="image" :src="item"></img>
+                            </div>
                         </el-carousel-item>
                     </el-carousel>
                 </div>
@@ -22,6 +23,58 @@
                         {{ room.name }}
                     </div>
                     <el-row :gutter="10">
+                        <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+                            <div class="Roominfo">
+                                <div class="bookingForm">
+                                    <el-form :model="bookingForm" :rules="rules" ref="bookingForm">
+                                        <el-form-item  prop="name">
+                                            <el-input  prefix-icon="el-icon-user-solid" placeholder="your Name" v-model="bookingForm.name"></el-input>
+                                        </el-form-item>
+                                        <el-form-item  prop="tel">
+                                            <el-input  prefix-icon="el-icon-phone" placeholder="your phone" v-model="bookingForm.tel"></el-input>
+                                        </el-form-item>
+                                        <el-form-item prop="date">
+                                            <HotelDatePicker
+                                             :startDate="new Date( starDay )"
+                                             :endDate="new Date( endDay )"
+                                             :disabledDates="bookedDate"
+                                             @check-out-changed="checkOutChanged"
+                                             @check-in-changed="checkInChanged"
+                                             >
+                                            </HotelDatePicker>
+                                        </el-form-item>
+                                        <el-form-item>
+                                            <el-button 
+                                            style="width:100%" 
+                                            type="info" 
+                                            plain 
+                                            @click="booking(room.id)"
+                                            v-loading.fullscreen.lock="fullscreenLoading"
+                                            >
+                                                BOOKING ROOM
+                                            </el-button>
+                                        </el-form-item>
+                                        <el-form-item>
+                                            <el-button 
+                                            style="width:100%" 
+                                            type="danger" 
+                                            plain 
+                                            @click="delBooking()"
+                                            v-loading.fullscreen.lock="fullscreenLoading"
+                                            >
+                                                DELETE DATA
+                                            </el-button>
+                                        </el-form-item>
+                                    </el-form>
+                                    <div class="roomDesc alignLeft">
+                                        <ul>
+                                            <li>weekday: {{ room.normalDayPrice | toCurrency }} / per Night</li>
+                                            <li>weekend: {{ room.holidayPrice | toCurrency }} / per Night</li>
+                                        </ul>
+                                    </div>                               
+                                </div>
+                            </div>
+                        </el-col>
                         <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
                             <div class="Roominfo">
                                 <div class="roomDesc justify">
@@ -40,42 +93,6 @@
                                 </div>
                             </div>
                         </el-col>
-                        <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                            <div class="Roominfo">
-                                <div class="bookingForm">
-                                    <el-form :model="bookingForm" :rules="rules" ref="bookingForm">
-                                        <el-form-item  prop="name">
-                                            <el-input  prefix-icon="el-icon-user-solid" placeholder="your Name" v-model="bookingForm.name"></el-input>
-                                        </el-form-item>
-                                        <el-form-item  prop="tel">
-                                            <el-input  prefix-icon="el-icon-phone" placeholder="your phone" v-model="bookingForm.tel"></el-input>
-                                        </el-form-item>
-                                        <el-form-item prop="date">
-                                            <!--:disabledDates="bookedDate"-->
-                                            <HotelDatePicker
-                                             :startDate="new Date(new Date())"
-                                             :endDate="new Date( endDay )"
-                                             :minNights="0"
-                                             :maxNights="1"
-                                             @check-out-changed="checkOutChanged"
-                                             @check-in-changed="checkInChanged"
-                                             >
-                                            </HotelDatePicker>
-                                        </el-form-item>
-                                        <el-form-item>
-                                            <el-button style="width:100%" type="info" plain @click="booking(room.id)">BOOKING ROOM</el-button>
-                                        </el-form-item>
-                                    </el-form>
-                                    <div class="roomDesc alignLeft">
-                                        <ul>
-                                            <li>weekday: {{ room.normalDayPrice | toCurrency }} / per Night</li>
-                                            <li>weekend: {{ room.holidayPrice | toCurrency }} / per Night</li>
-                                        </ul>
-                                    </div>                               
-                                </div>
-                            </div>
-                        </el-col>
-                        
                     </el-row>
                     <el-divider content-position="left">Amenities</el-divider>
                      <div class="amenitiesBox" v-if="room.amenities">
@@ -143,7 +160,7 @@
 </template>
 
 <script>
-import { getRoomsDetail } from "../RoomApi"
+import { getRoomsDetail, bookingDel } from "../RoomApi"
 import bookingDialog from '@/components/bookingDialog.vue';
 import HotelDatePicker from 'vue-hotel-datepicker';
 import { homedir } from 'os';
@@ -152,6 +169,7 @@ export default {
   name: 'roomdetail',
   data() {
     return {
+        fullscreenLoading: false,
         dialogVisible: false,
         room: [],
         roomId: '',
@@ -175,8 +193,10 @@ export default {
             { validator: this.checkDatePick, trigger: 'blur' }
           ],
         },
-        endDay :'', // 只能訂90內的日期設定
+        starDay: '',
+        endDay: '', // 只能訂90內的日期設定
         bookedDate: [], // 存放已經被預定的日期
+        bookedList: [],
         holidays: 0, // 計算預定假日幾晚
         weekdays: 0, // 計算預定平日幾晚
         holiDayPrice: 0,
@@ -185,6 +205,7 @@ export default {
   },
   created() {
       this.endDay = this.addDaysSet(90);
+      this.starDay = this.addDaysSet(1);
   },
   watch: { 
      '$route.name': {
@@ -204,7 +225,7 @@ export default {
                     // 處理訂房的東西
                     this.calDate(this.bookingForm.start, this.bookingForm.end);
                     this.dialogVisible = true;
-                   
+
                 } else {
                     console.log('error submit!!');
                     return false;
@@ -213,19 +234,24 @@ export default {
         },
         // 取得單一房型資料
         getDetail(newValue, oldValue) {
+            this.fullscreenLoading = true;
             if (this.$route.params.id){
                 getRoomsDetail(this.$route.params.id)
                     .then(res => {
                         this.room = res.data.room[0];
                         this.weekdayPrice = this.room.normalDayPrice;
                         this.holiDayPrice = this.room.holidayPrice;
-                        this.bookedDate = res.data.booking;
+                        // 只要已被預訂的日期
+                        this.bookedList = res.data.booking 
+                        const dateList = Object.values(this.bookedList).map(item => item.date);
+                        this.bookedDate = dateList
                         console.log(res.data);
                     })
                     .catch(err => {
                         console.log(err);
                     })
             }
+            this.fullscreenLoading = false;
         },
         // Router
         checkRouterName() {
@@ -262,7 +288,7 @@ export default {
                     weekdays++;
                 }
                 this.dateFormat(from);
-                // this.bookingForm.date.push(this.dateFormat(from));
+                this.bookingForm.day.push(this.dateFormat(from));
                 from.setDate(from.getDate() +1);
             }
             this.holidays = holidays;
@@ -275,26 +301,45 @@ export default {
             // add zero
             m = (m.length === 1) ? '0' + m : m;
             d = (d.length === 1) ? '0' + d : d;
-            this.bookingForm.day.push(y + '-' + m + '-' + d)
+            //this.bookingForm.day.push(y + '-' + m + '-' + d)
             return y + '-' + m + '-' + d;
         },
-
         checkOutChanged (val) {
             this.bookingForm.end = val;
-           
         },
         checkInChanged (val) {
             this.bookingForm.start = val;
         },
         checkDatePick(rule, value, callback) {
-		    if (this.bookingForm.start && this.bookingForm.end) {
-				callback();
-			} else {
-				callback('請選擇入住日+退房日');
+            if (this.bookingForm.start && this.bookingForm.end) {
+                if (this.bookedDate.indexOf(this.dateFormat(this.bookingForm.start)) < 0) {
+                    callback();
+                } else {
+                    callback('黃道吉日已被訂走囉!請重選日期啦');
+                }
+            } else {
+                callback('請選入住&退房日期唷!');
             }
-        }	
-    },
-
+        },
+        // 清除所有預約
+        delBooking() {
+            this.fullscreenLoading = true;
+            bookingDel()
+                .then(res => {
+                    console.log(res.data);
+                    this.$alert('訂房都刪除囉', '刪除', {
+                      confirmButtonText: 'OK',
+                      callback: action => {
+                        this.$router.go()  
+                      }
+                    });
+                    this.fullscreenLoading = false
+                })
+                .catch(err => {
+                    console.log(err);
+            })
+        }
+    }
 }
 </script>
 <style scoped>
@@ -370,5 +415,14 @@ export default {
 a {
     text-decoration: none;
     color:#2c3e50;
+}
+.imgBox {
+  width:100%;
+  height:680px;
+  overflow: hidden;
+}
+.imgBox .image {
+  object-fit: cover;
+  height: 680px;
 }
 </style>
