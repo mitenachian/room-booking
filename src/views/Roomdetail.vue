@@ -335,7 +335,6 @@ export default {
                           message: 'Booking資料已清空',
                           type: 'success',
                         });
-                    });
                     this.fullscreenLoading = false
                 })
                 .catch(err => {
