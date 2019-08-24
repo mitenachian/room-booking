@@ -330,11 +330,11 @@ export default {
             bookingDel()
                 .then(res => {
                     console.log(res.data);
-                    this.$alert('訂房都刪除囉', '刪除', {
-                      confirmButtonText: 'OK',
-                      callback: action => {
-                        this.$router.go()  
-                      }
+                        this.$notify({
+                          title: '完成',
+                          message: 'Booking資料已清空',
+                          type: 'success',
+                        });
                     });
                     this.fullscreenLoading = false
                 })
