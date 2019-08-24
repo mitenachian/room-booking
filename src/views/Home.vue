@@ -112,6 +112,7 @@ export default {
   position: absolute;
   height:380px;
   min-width: 100%;
+  top:-60px;
 }
 
 </style>
