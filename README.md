@@ -1,5 +1,6 @@
 # room-booking
 
+[DEMO](https://mitenachian.github.io/room-booking/)
 ## Project setup
 ```
 npm install
